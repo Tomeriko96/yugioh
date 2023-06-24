@@ -1,0 +1,74 @@
+---
+title: "Exploratory Data Analysis (EDA) of Yugioh Card Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Exploratory Data Analysis (EDA) of Yugioh Card Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "pdf"
+)
+
+```
+
+# Introduction
+This vignette provides an exploratory data analysis (EDA) of the `Yu-Gi-Oh` card data. EDA helps us understand the dataset and gain insights into various aspects of the `Yu-Gi-Oh` cards.
+
+## Dataset Overview
+The Yugioh card dataset used in this analysis contains information about different Yugioh cards, including their types, attributes, attack points (ATK), defense points (DEF), and more. Let's load the dataset and take a look at its summary statistics:
+
+
+```{r setup}
+library(yugioh)
+
+## First check the current version of the database
+version <- get_yugioh_database_version()
+
+df <- get_all_yugioh_cards()
+```
+
+## Data Exploration
+
+### Distribution of Card Types
+
+Let's start by exploring the distribution of different card types in the dataset.
+
+```{r} 
+library(ggplot2)
+
+# Plot the distribution of card types
+card_type_counts <- table(df$type)
+card_type_counts <- sort(card_type_counts, decreasing = TRUE)
+distribution = data.frame(card_type = names(card_type_counts), count = card_type_counts)
+
+ggplot(distribution, aes(x = card_type, y = count.Freq)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  xlab("Card Type") +
+  ylab("Count") +
+  ggtitle("Distribution of Yugioh Card Types") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+## Distribution of Attack points
+
+```{r}
+library(ggplot2)
+
+# Filter rows with non-missing ATK values
+filtered_df <- df[!is.na(df$atk), ]
+
+# Create a box plot of ATK by card type with rotated x-axis labels
+ggplot(filtered_df, aes(x = reorder(type, atk), y = atk)) +
+  geom_boxplot(fill = "steelblue") +
+  labs(x = "Card Type", y = "ATK") +
+  ggtitle("Distribution of Attack Points (ATK) by Card Type") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
